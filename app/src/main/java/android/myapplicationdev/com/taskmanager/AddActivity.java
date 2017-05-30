@@ -14,7 +14,7 @@ import java.util.Calendar;
 
 public class AddActivity extends AppCompatActivity {
 
-    EditText etName, etDescription;
+    EditText etName, etDescription, etRemind;
     Button btnAddTask, btnCancel;
 
     @Override
@@ -28,22 +28,27 @@ public class AddActivity extends AppCompatActivity {
         btnCancel = (Button) findViewById(R.id. btnCancel);
         final int reqCode = 12345;
 
+        etRemind = (EditText) findViewById(R.id. etRemind);
+
         btnAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent();
                 String name = etName.getText().toString();
                 String description = etDescription.getText().toString();
+                String reminder = etRemind.getText().toString();
+                int reminderTime = Integer.parseInt(reminder);
 
                 DBHelper db = new DBHelper(AddActivity.this);
                 db.insertTask(name, description);
                 Task task = new Task(name, description);
                 i.putExtra("task", task);
                 setResult(RESULT_OK, i);
+                // Go back 1st page
                 finish();
 
                 Calendar cal = Calendar.getInstance();
-                cal.add(Calendar.SECOND, 5);
+                cal.add(Calendar.SECOND, reminderTime);
 
                 Intent intent = new Intent(AddActivity.this,
                         NotificationReceiver.class);
