@@ -21,6 +21,7 @@ public class Task implements Serializable{
         return description;
     }
 
+    private String id;
     private String name;
     private String description;
 

@@ -10,8 +10,6 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
-import static android.R.attr.data;
-
 public class MainActivity extends AppCompatActivity {
 
     Button btnAddTask;
@@ -19,8 +17,6 @@ public class MainActivity extends AppCompatActivity {
 
     TaskAdapter ta;
     ArrayList<Task> taskArrayList = new ArrayList<Task>();
-    int requestCode = 1;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,38 +25,32 @@ public class MainActivity extends AppCompatActivity {
 
         btnAddTask = (Button) findViewById(R.id.btnAddTask);
         lv = (ListView) findViewById(R.id.lv);
+        DBHelper dbh = new DBHelper(MainActivity.this);
+
+        taskArrayList = dbh.getTasks();
         ta = new TaskAdapter(this, R.layout.row, taskArrayList);
         lv.setAdapter(ta);
-        displayTask();
 
         btnAddTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, AddActivity.class);
-                startActivityForResult(i, requestCode);
+                startActivityForResult(i, 9);
             }
         });
     }
         protected void onActivityResult(int requestCode, int resultCode, Intent data) {
             super.onActivityResult(requestCode, resultCode, data);
 
-            if (resultCode == RESULT_OK) {
-                if (data != null) {
-                    displayTask();
+            if (resultCode == RESULT_OK && requestCode == 9) {
+                DBHelper dbh = new DBHelper(MainActivity.this);
+                taskArrayList.clear();
+                taskArrayList.addAll(dbh.getTasks());
+                dbh.close();
+                ta.notifyDataSetChanged();
                 }
             }
         }
 
-    public void displayTask() {
-        taskArrayList.clear();
-        DBHelper db = new DBHelper(MainActivity.this);
-        ArrayList<Task> task = db.getTasks();
-        db.close();
-        for (int i = 0; i < task.size(); i++){
-            taskArrayList.add(new Task(task.get(i).getName(), task.get(i).getDescription()));
-        }
-        ta.notifyDataSetChanged();
-    }
-}
 
 
